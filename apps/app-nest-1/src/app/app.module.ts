@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { ConfigModule } from '@nestjs/config';
+import { LoggerBuiltInModule } from './logger-built-in/logger-built-in.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
       expandVariables: true,
       // cache: true,
     }),
+    LoggerBuiltInModule,
   ],
 })
 export class AppModule {}
