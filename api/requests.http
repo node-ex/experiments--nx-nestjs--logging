@@ -1,1 +1,17 @@
-GET http://localhost:3000/api/logger/built-in
+GET http://localhost:3000/api/loggers/built-in/logger/global
+
+###
+
+GET http://localhost:3000/api/loggers/built-in/logger/local
+
+###
+
+GET http://localhost:3000/api/loggers/built-in/console-logger/local
+
+###
+
+GET http://localhost:3000/api/loggers/built-in/logger/injected
+
+###
+
+GET http://localhost:3000/api/loggers/built-in/console-logger/injected

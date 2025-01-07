@@ -1,9 +1,8 @@
 import { ConsoleLogger, Logger, Module } from '@nestjs/common';
-
-import { LoggerBuiltInController } from './logger-built-in.controller';
+import { LoggersBuiltInController } from './loggers-built-in.controller';
 
 @Module({
-  controllers: [LoggerBuiltInController],
+  controllers: [LoggersBuiltInController],
   providers: [Logger, ConsoleLogger],
 })
 export class LoggerBuiltInModule {}
