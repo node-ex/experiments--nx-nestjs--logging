@@ -27,21 +27,29 @@ export class CustomConsoleLoggerFactoryService {
       timestamp: true,
     },
   ): AbstractCustomConsoleLogger {
+    const showDebugInfo =
+      this.configService.get<string>('LOGGER_BUILT_IN__SHOW_DEBUG_INFO') ===
+      'true';
     const isStructuredLoggingEnabled =
       this.configService.get<string>(
         'LOGGER_BUILT_IN__STRUCTURED_LOGGING__IS_ENABLED',
       ) === 'true';
-    const prettyPrintStructuredLogs =
+    const prettyPrint =
       this.configService.get<string>(
         'LOGGER_BUILT_IN__STRUCTURED_LOGGING__PRETTY_PRINT',
       ) === 'true';
 
     if (isStructuredLoggingEnabled) {
-      return new StructuredCustomConsoleLogger(context ?? '', options, {
-        prettyPrint: prettyPrintStructuredLogs,
+      return new StructuredCustomConsoleLogger(context ?? '', {
+        ...options,
+        showDebugInfo,
+        prettyPrint,
       });
     }
 
-    return new UnstructuredCustomConsoleLogger(context ?? '', options);
+    return new UnstructuredCustomConsoleLogger(context ?? '', {
+      ...options,
+      showDebugInfo,
+    });
   }
 }

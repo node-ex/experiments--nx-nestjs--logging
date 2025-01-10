@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { LoggerBuiltInModule } from './logger-built-in/logger-built-in.module';
+import { LoggerBuiltInModule } from './logger-built-in/modules/logger-built-in.module';
 
 @Module({
   imports: [

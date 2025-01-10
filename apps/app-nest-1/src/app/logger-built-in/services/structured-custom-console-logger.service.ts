@@ -1,7 +1,8 @@
-import { ConsoleLoggerOptions, LogLevel, Optional } from '@nestjs/common';
+import { LogLevel, Optional } from '@nestjs/common';
 import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.service';
+import { ICustomStructuredConsoleLoggerOptions } from '../interfaces/custom-structured-console-logger-options.interface';
 
-export interface StructuredConsoleLoggerOutput {
+interface IStructuredConsoleLoggerOutput {
   timestamp: string;
   pid: number;
   context: string;
@@ -9,35 +10,20 @@ export interface StructuredConsoleLoggerOutput {
   message: string;
 }
 
-export interface StructuredLoggingOptions {
-  prettyPrint?: boolean | undefined;
-}
-
 export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
   /**
-   * Modified to include the structured logging options
-   *
-   * Otherwise a copy-paste of the built-in implementation:
-   * https://github.com/nestjs/nest/blob/master/packages/common/services/console-logger.service.ts
+   * Modified to include structured logging options
    */
   constructor();
   // eslint-disable-next-line @typescript-eslint/unified-signatures
   constructor(context: string);
   // eslint-disable-next-line @typescript-eslint/unified-signatures
-  constructor(context: string, options: ConsoleLoggerOptions);
-  constructor(
-    context: string,
-    options: ConsoleLoggerOptions,
-    // eslint-disable-next-line @typescript-eslint/unified-signatures
-    structuredLoggingOptions: StructuredLoggingOptions,
-  );
+  constructor(context: string, options: ICustomStructuredConsoleLoggerOptions);
   constructor(
     @Optional()
     context?: string,
     @Optional()
-    options: ConsoleLoggerOptions = {},
-    @Optional()
-    protected structuredLoggingOptions: StructuredLoggingOptions = {},
+    protected override options: ICustomStructuredConsoleLoggerOptions = {},
   ) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     super(context!, options);
@@ -53,7 +39,7 @@ export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
     writeStreamType?: 'stdout' | 'stderr',
   ): void {
     messages.forEach((message) => {
-      const messageObject: StructuredConsoleLoggerOutput = {
+      const messageObject: IStructuredConsoleLoggerOutput = {
         timestamp: this.getTimestamp(),
         pid: process.pid,
         context,
@@ -62,7 +48,7 @@ export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
       };
 
       let serializedMessage = '';
-      if (this.structuredLoggingOptions.prettyPrint) {
+      if (this.options.prettyPrint) {
         serializedMessage = JSON.stringify(messageObject, null, 2);
       } else {
         serializedMessage = JSON.stringify(messageObject);

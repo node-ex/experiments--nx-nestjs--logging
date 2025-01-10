@@ -7,7 +7,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AppModule } from './app/app.module';
-import { CustomConsoleLoggerFactoryService } from './app/logger-built-in/custom-console-logger-factory.service';
+import { CustomConsoleLoggerFactoryService } from './app/logger-built-in/services/custom-console-logger-factory.service';
 
 async function bootstrap() {
   await ConfigModule.envVariablesLoaded;

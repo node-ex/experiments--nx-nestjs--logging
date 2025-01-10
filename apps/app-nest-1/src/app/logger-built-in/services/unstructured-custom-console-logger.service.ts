@@ -42,9 +42,11 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
         formattedMessage,
       );
 
+      const debugLine = this.formatAndColorizeDebugLine();
+
       const output = this.formatAndColorizeOutput(
         metaLine,
-        undefined,
+        debugLine,
         messageLine,
       );
 
@@ -69,6 +71,16 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
     const colorizedTimestampDiff = formattedTimestampDiff;
 
     const line = `${colorizedTimestamp} ${colorizedPid} ${colorizedLogLevel} ${colorizedTimestampDiff}`;
+
+    return line;
+  }
+
+  protected formatAndColorizeDebugLine(): string | undefined {
+    if (!this.options.showDebugInfo) {
+      return undefined;
+    }
+
+    const line = clc.bold('Debug line');
 
     return line;
   }
