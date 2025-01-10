@@ -15,3 +15,7 @@ GET http://localhost:3000/api/loggers/built-in/logger/injected
 ###
 
 GET http://localhost:3000/api/loggers/built-in/console-logger/injected
+
+###
+
+GET http://localhost:3000/api/custom-console-logger
