@@ -1,8 +1,9 @@
-import { ConsoleLoggerOptions, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { StructuredCustomConsoleLogger } from './structured-custom-console-logger.service';
 import { UnstructuredCustomConsoleLogger } from './unstructured-custom-console-logger.service';
 import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.service';
+import { ICustomConsoleLoggerOptions } from '../interfaces/custom-console-logger-options.interface';
 
 @Injectable()
 export class CustomConsoleLoggerFactoryService {
@@ -19,13 +20,11 @@ export class CustomConsoleLoggerFactoryService {
     context: string,
 
     // eslint-disable-next-line @typescript-eslint/unified-signatures
-    options: ConsoleLoggerOptions,
+    options: ICustomConsoleLoggerOptions,
   ): AbstractCustomConsoleLogger;
   createLogger(
     context?: string,
-    options: ConsoleLoggerOptions = {
-      timestamp: true,
-    },
+    options: ICustomConsoleLoggerOptions = {},
   ): AbstractCustomConsoleLogger {
     const showDebugInfo =
       this.configService.get<string>('LOGGER_BUILT_IN__SHOW_DEBUG_INFO') ===

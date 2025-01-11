@@ -21,7 +21,11 @@ async function bootstrap() {
   const customConsoleLoggerFactoryService = app.get(
     CustomConsoleLoggerFactoryService,
   );
-  app.useLogger(customConsoleLoggerFactoryService.createLogger());
+  app.useLogger(
+    customConsoleLoggerFactoryService.createLogger('', {
+      debugStackLevel: 8,
+    }),
+  );
 
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

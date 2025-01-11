@@ -1,6 +1,7 @@
 import { LogLevel } from '@nestjs/common';
 import { clc } from '@nestjs/common/utils/cli-colors.util';
 import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.service';
+import { CallSitesUtils } from '../utils/call-sites.utils';
 
 export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
   /**
@@ -37,12 +38,12 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
         formattedTimestampDiff,
       );
 
+      const debugLine = this.formatAndColorizeDebugLine();
+
       const messageLine = this.formatAndColorizeMessageLine(
         formattedContext,
         formattedMessage,
       );
-
-      const debugLine = this.formatAndColorizeDebugLine();
 
       const output = this.formatAndColorizeOutput(
         metaLine,
@@ -52,10 +53,6 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
 
       process[writeStreamType ?? 'stdout'].write(output);
     });
-  }
-
-  protected override formatTimestampDiff(timestampDiff: number) {
-    return ` +${timestampDiff.toString()}ms`;
   }
 
   protected formatAndColorizeMetaLine(
@@ -75,32 +72,41 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
     return line;
   }
 
-  protected formatAndColorizeDebugLine(): string | undefined {
+  protected formatAndColorizeDebugLine(): string | null {
     if (!this.options.showDebugInfo) {
-      return undefined;
+      return null;
     }
 
-    const line = clc.bold('Debug line');
+    const codeLocation = CallSitesUtils.getCodeLocation(
+      this.options.debugStackLevel,
+    );
+    const typeName = CallSitesUtils.getTypeName(this.options.debugStackLevel);
+    const callableName = CallSitesUtils.getCallableName(
+      this.options.debugStackLevel,
+    );
 
-    return line;
+    if (typeName) {
+      return clc.bold(`${codeLocation}/${typeName}.${callableName}()`);
+    }
+
+    return clc.bold(`${codeLocation}/${callableName}()`);
   }
 
   protected formatAndColorizeMessageLine(
     formattedContext: string,
     formattedMessage: string,
   ): string {
-    let line = formattedMessage;
     if (formattedContext) {
       const colorizedContext = clc.bold(formattedContext);
-      line = `${colorizedContext}: ${line}`;
+      return `${colorizedContext}: ${formattedMessage}`;
     }
 
-    return line;
+    return formattedMessage;
   }
 
   protected formatAndColorizeOutput(
     metaLine: string,
-    debugLine: string | undefined,
+    debugLine: string | null,
     messageLine: string,
   ): string {
     if (debugLine) {

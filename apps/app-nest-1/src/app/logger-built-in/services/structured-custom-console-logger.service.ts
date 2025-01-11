@@ -1,12 +1,21 @@
 import { LogLevel, Optional } from '@nestjs/common';
 import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.service';
 import { ICustomStructuredConsoleLoggerOptions } from '../interfaces/custom-structured-console-logger-options.interface';
+import { CallSitesUtils } from '../utils/call-sites.utils';
+
+interface IStructuredConsoleLoggerOutputDebugInfo {
+  codeLocation: string;
+  typeName: string;
+  callableName: string;
+}
 
 interface IStructuredConsoleLoggerOutput {
   timestamp: string;
+  timestampDiff: string;
   pid: number;
-  context: string;
   level: LogLevel;
+  debug?: IStructuredConsoleLoggerOutputDebugInfo;
+  context: string;
   message: string;
 }
 
@@ -39,11 +48,15 @@ export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
     writeStreamType?: 'stdout' | 'stderr',
   ): void {
     messages.forEach((message) => {
+      const debug = this.getDebugInfo();
+
       const messageObject: IStructuredConsoleLoggerOutput = {
         timestamp: this.getTimestamp(),
+        timestampDiff: this.updateAndGetTimestampDiff(),
         pid: process.pid,
-        context,
         level: logLevel,
+        ...(debug && { debug }),
+        context,
         message: this.stringifyMessage(message, logLevel) as string,
       };
 
@@ -66,13 +79,30 @@ export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
     return message;
   }
 
-  /**
-   * New method
-   */
   protected printMessage(
     message: string,
     writeStreamType?: 'stdout' | 'stderr',
   ): void {
     process[writeStreamType ?? 'stdout'].write(message + '\n');
+  }
+
+  protected getDebugInfo(): IStructuredConsoleLoggerOutputDebugInfo | null {
+    if (!this.options.showDebugInfo) {
+      return null;
+    }
+
+    const codeLocation = CallSitesUtils.getCodeLocation(
+      this.options.debugStackLevel,
+    );
+    const typeName = CallSitesUtils.getTypeName(this.options.debugStackLevel);
+    const callableName = CallSitesUtils.getCallableName(
+      this.options.debugStackLevel,
+    );
+
+    return {
+      codeLocation,
+      typeName,
+      callableName,
+    };
   }
 }

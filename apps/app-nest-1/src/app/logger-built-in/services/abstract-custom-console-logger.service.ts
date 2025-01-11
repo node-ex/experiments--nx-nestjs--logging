@@ -20,6 +20,8 @@ export abstract class AbstractCustomConsoleLogger extends ConsoleLogger {
     @Optional()
     protected override options: ICustomConsoleLoggerOptions = {},
   ) {
+    options.timestamp = true;
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     super(context!, options);
   }
@@ -27,24 +29,11 @@ export abstract class AbstractCustomConsoleLogger extends ConsoleLogger {
   /**
    * @param stackOrContext Do not use for the structured logging
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  override error(message: any, stackOrContext?: string): void;
+  // override error(message: any, stackOrContext?: string): void;
   /**
    * @param stack Do not use for the structured logging
    */
-  // eslint-disable-next-line @typescript-eslint/unified-signatures, @typescript-eslint/no-explicit-any
-  override error(message: any, stack?: string, context?: string): void;
-  override error(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    message: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...optionalParams: [...any, string?, string?]
-  ): void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  override error(message: any, ...optionalParams: any[]) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    super.error(message, ...optionalParams);
-  }
+  // override error(message: any, stack?: string, context?: string): void;
 
   /**
    * Could be used for both the structured and unstructured logging
@@ -158,9 +147,10 @@ export abstract class AbstractCustomConsoleLogger extends ConsoleLogger {
   }
 
   /**
-   * Should be used only for the unstructured logging
+   * Modified to remove space and colorization. Could be used for both the structured and
+   * unstructured logging.
    */
   protected override formatTimestampDiff(timestampDiff: number) {
-    return super.formatTimestampDiff(timestampDiff);
+    return `+${timestampDiff.toString()}ms`;
   }
 }

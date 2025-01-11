@@ -1,0 +1,1 @@
+export const DEFAULT_CALL_SITES_STACK_LEVEL = 6;
