@@ -1,4 +1,11 @@
-# template--nx-nestjs--basic
+# experiments--nx-nestjs--logging
+
+## Experiment
+
+1. Run `pnpm install`
+2. Copy `.env.template` as `.env` and add/change values if needed
+3. Run the app using `pnpm exec nx run app-nest-1:serve`
+4. Enable "REST Client" extension in VSCode and run the requests in `./api/requests.http` file
 
 ## Local development
 
