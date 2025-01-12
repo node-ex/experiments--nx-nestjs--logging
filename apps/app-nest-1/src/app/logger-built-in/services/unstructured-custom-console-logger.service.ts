@@ -19,30 +19,12 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
     writeStreamType?: 'stdout' | 'stderr',
   ) {
     messages.forEach((message) => {
-      const formattedTimestamp = this.getTimestamp();
-      const formattedPid = process.pid.toString().padStart(7, ' ');
-      const formattedLogLevel = logLevel.toUpperCase().padEnd(7, ' ');
-      const formattedTimestampDiff = this.updateAndGetTimestampDiff();
-
-      const formattedContext = context;
-      const formattedMessage = this.stringifyMessage(
-        message,
-        logLevel,
-      ) as string;
-
-      const metaLine = this.formatAndColorizeMetaLine(
-        logLevel,
-        formattedTimestamp,
-        formattedPid,
-        formattedLogLevel,
-        formattedTimestampDiff,
-      );
-
+      const metaLine = this.formatAndColorizeMetaLine(logLevel);
       const debugLine = this.formatAndColorizeDebugLine();
-
       const messageLine = this.formatAndColorizeMessageLine(
-        formattedContext,
-        formattedMessage,
+        logLevel,
+        context,
+        message,
       );
 
       const output = this.formatAndColorizeOutput(
@@ -55,19 +37,30 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
     });
   }
 
-  protected formatAndColorizeMetaLine(
-    logLevel: LogLevel,
-    formattedTimestamp: string,
-    formattedPid: string,
-    formattedLogLevel: string,
-    formattedTimestampDiff: string,
-  ): string {
+  protected formatAndColorizeMetaLine(logLevel: LogLevel): string {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const entryMode = this.clsService.get('entryMode') ?? 'system';
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const correlationId = this.clsService.getId() ?? null;
+
+    const formattedLogLevel = logLevel.toUpperCase().padEnd(7, ' ');
+    const formattedTimestamp = this.getTimestamp();
+    const formattedPid = process.pid.toString().padStart(7, ' ');
+    const formattedEntryMode = entryMode.padEnd(6, ' ');
+    const formattedCorrelationId = String(correlationId).padEnd(36, ' ');
+    const formattedTimestampDiff = this.updateAndGetTimestampDiff();
+
+    const colorizedLogLevel = this.colorize(formattedLogLevel, logLevel);
     const colorizedTimestamp = this.colorize(formattedTimestamp, logLevel);
     const colorizedPid = this.colorize(formattedPid, logLevel);
-    const colorizedLogLevel = this.colorize(formattedLogLevel, logLevel);
+    const colorizedEntryMode = this.colorize(formattedEntryMode, logLevel);
+    const colorizedCorrelationId = this.colorize(
+      formattedCorrelationId,
+      logLevel,
+    );
     const colorizedTimestampDiff = formattedTimestampDiff;
 
-    const line = `${colorizedTimestamp} ${colorizedPid} ${colorizedLogLevel} ${colorizedTimestampDiff}`;
+    const line = `${colorizedLogLevel} ${colorizedTimestamp} ${colorizedPid} ${colorizedEntryMode} ${colorizedCorrelationId} ${colorizedTimestampDiff}`;
 
     return line;
   }
@@ -93,9 +86,13 @@ export class UnstructuredCustomConsoleLogger extends AbstractCustomConsoleLogger
   }
 
   protected formatAndColorizeMessageLine(
-    formattedContext: string,
-    formattedMessage: string,
+    logLevel: LogLevel,
+    context: string,
+    message: unknown,
   ): string {
+    const formattedContext = context;
+    const formattedMessage = this.stringifyMessage(message, logLevel) as string;
+
     if (formattedContext) {
       const colorizedContext = clc.bold(formattedContext);
       return `${colorizedContext}: ${formattedMessage}`;

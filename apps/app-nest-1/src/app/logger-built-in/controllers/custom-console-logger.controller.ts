@@ -1,6 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
-import { AbstractCustomConsoleLogger } from '../services/abstract-custom-console-logger.service';
-import { CustomConsoleLoggerFactory } from '../services/custom-console-logger.factory';
+import { Controller, Get, Logger } from '@nestjs/common';
 
 const LOREM_IPSUM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam mi dictum, sagittis neque ut, fringilla nunc. Nam venenatis ac ante sed gravida. Duis sit amet commodo ligula, vitae mollis enim. Suspendisse potenti. Integer semper sapien non fringilla laoreet. Pellentesque porttitor vulputate libero sed auctor. Donec consectetur sem vel erat auctor, eu porta ex luctus.
 
@@ -8,13 +6,7 @@ Proin lacus enim, sollicitudin bibendum velit et, cursus consequat erat. Nam orn
 
 @Controller('custom-console-logger')
 export class CustomConsoleLoggerController {
-  private readonly logger: AbstractCustomConsoleLogger;
-
-  constructor(customConsoleLoggerFactory: CustomConsoleLoggerFactory) {
-    this.logger = customConsoleLoggerFactory.createLogger(
-      CustomConsoleLoggerController.name,
-    );
-  }
+  private readonly logger = new Logger(CustomConsoleLoggerController.name);
 
   @Get()
   use() {

@@ -4,24 +4,19 @@ import { StructuredCustomConsoleLogger } from './structured-custom-console-logge
 import { UnstructuredCustomConsoleLogger } from './unstructured-custom-console-logger.service';
 import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.service';
 import { ICustomConsoleLoggerOptions } from '../interfaces/custom-console-logger-options.interface';
+import { CustomClsServiceProvider } from '../../custom-cls/providers/custom-cls-service.provider';
 
 @Injectable()
 export class CustomConsoleLoggerFactory {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly clsService: CustomClsServiceProvider,
+  ) {}
 
   /**
-   * Signature copied from the NestJS ConsoleLogger constructor:
+   * Signature is based on the built-in ConsoleLogger's constructor signature:
    * https://github.com/nestjs/nest/blob/master/packages/common/services/console-logger.service.ts
    */
-  createLogger(): AbstractCustomConsoleLogger;
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  createLogger(context: string): AbstractCustomConsoleLogger;
-  createLogger(
-    context: string,
-
-    // eslint-disable-next-line @typescript-eslint/unified-signatures
-    options: ICustomConsoleLoggerOptions,
-  ): AbstractCustomConsoleLogger;
   createLogger(
     context?: string,
     options: ICustomConsoleLoggerOptions = {},
@@ -39,14 +34,14 @@ export class CustomConsoleLoggerFactory {
       ) === 'true';
 
     if (isStructuredLoggingEnabled) {
-      return new StructuredCustomConsoleLogger(context ?? '', {
+      return new StructuredCustomConsoleLogger(this.clsService, context ?? '', {
         ...options,
         showDebugInfo,
         prettyPrint,
       });
     }
 
-    return new UnstructuredCustomConsoleLogger(context ?? '', {
+    return new UnstructuredCustomConsoleLogger(this.clsService, context ?? '', {
       ...options,
       showDebugInfo,
     });

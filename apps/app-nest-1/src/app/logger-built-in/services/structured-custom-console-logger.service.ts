@@ -1,7 +1,8 @@
-import { LogLevel, Optional } from '@nestjs/common';
+import { LogLevel } from '@nestjs/common';
 import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.service';
 import { ICustomStructuredConsoleLoggerOptions } from '../interfaces/custom-structured-console-logger-options.interface';
 import { CallSitesUtils } from '../utils/call-sites.utils';
+import { CustomClsServiceProvider } from '../../custom-cls/providers/custom-cls-service.provider';
 
 interface IStructuredConsoleLoggerOutputDebugInfo {
   codeLocation: string;
@@ -10,10 +11,12 @@ interface IStructuredConsoleLoggerOutputDebugInfo {
 }
 
 interface IStructuredConsoleLoggerOutput {
+  logLevel: LogLevel;
   timestamp: string;
   timestampDiff: string;
   pid: number;
-  level: LogLevel;
+  entryMode: string;
+  correlationId: string | null;
   debug?: IStructuredConsoleLoggerOutputDebugInfo;
   context: string;
   message: string;
@@ -21,21 +24,16 @@ interface IStructuredConsoleLoggerOutput {
 
 export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
   /**
-   * Modified to include structured logging options
+   * Signature is based on the built-in implementation:
+   * https://github.com/nestjs/nest/blob/master/packages/common/services/console-logger.service.ts
    */
-  constructor();
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  constructor(context: string);
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  constructor(context: string, options: ICustomStructuredConsoleLoggerOptions);
   constructor(
-    @Optional()
+    clsService: CustomClsServiceProvider,
     context?: string,
-    @Optional()
     protected override options: ICustomStructuredConsoleLoggerOptions = {},
   ) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    super(context!, options);
+    super(clsService, context, options);
   }
 
   /**
@@ -49,12 +47,18 @@ export class StructuredCustomConsoleLogger extends AbstractCustomConsoleLogger {
   ): void {
     messages.forEach((message) => {
       const debug = this.getDebugInfo();
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const entryMode = this.clsService.get('entryMode') ?? 'system';
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const correlationId = this.clsService.getId() ?? null;
 
       const messageObject: IStructuredConsoleLoggerOutput = {
+        logLevel,
         timestamp: this.getTimestamp(),
         timestampDiff: this.updateAndGetTimestampDiff(),
         pid: process.pid,
-        level: logLevel,
+        entryMode,
+        correlationId,
         ...(debug && { debug }),
         context,
         message: this.stringifyMessage(message, logLevel) as string,

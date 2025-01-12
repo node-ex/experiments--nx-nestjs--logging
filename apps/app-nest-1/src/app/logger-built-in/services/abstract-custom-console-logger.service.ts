@@ -1,23 +1,17 @@
-import { ConsoleLogger, LogLevel, Optional } from '@nestjs/common';
+import { ConsoleLogger, LogLevel } from '@nestjs/common';
 import { isFunction, isPlainObject } from '@nestjs/common/utils/shared.utils';
+import { CustomClsServiceProvider } from '../../custom-cls/providers/custom-cls-service.provider';
 import { ICustomConsoleLoggerOptions } from '../interfaces/custom-console-logger-options.interface';
 
 export abstract class AbstractCustomConsoleLogger extends ConsoleLogger {
   /**
-   * Modified to include custom logging options
-   *
-   * Otherwise a copy-paste of the built-in implementation:
+   * Signature is based on the built-in implementation:
    * https://github.com/nestjs/nest/blob/master/packages/common/services/console-logger.service.ts
    */
-  constructor();
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  constructor(context: string);
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  constructor(context: string, options: ICustomConsoleLoggerOptions);
   constructor(
-    @Optional()
+    protected readonly clsService: CustomClsServiceProvider,
     context?: string,
-    @Optional()
+
     protected override options: ICustomConsoleLoggerOptions = {},
   ) {
     options.timestamp = true;
