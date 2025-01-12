@@ -6,7 +6,7 @@ import { AbstractCustomConsoleLogger } from './abstract-custom-console-logger.se
 import { ICustomConsoleLoggerOptions } from '../interfaces/custom-console-logger-options.interface';
 
 @Injectable()
-export class CustomConsoleLoggerFactoryService {
+export class CustomConsoleLoggerFactory {
   constructor(private readonly configService: ConfigService) {}
 
   /**

@@ -7,7 +7,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AppModule } from './app/app.module';
-import { CustomConsoleLoggerFactoryService } from './app/logger-built-in/services/custom-console-logger-factory.service';
+import { CustomConsoleLoggerFactory } from './app/logger-built-in/services/custom-console-logger.factory';
 
 async function bootstrap() {
   await ConfigModule.envVariablesLoaded;
@@ -18,11 +18,9 @@ async function bootstrap() {
   });
 
   /* Setup custom logger */
-  const customConsoleLoggerFactoryService = app.get(
-    CustomConsoleLoggerFactoryService,
-  );
+  const customConsoleLoggerFactory = app.get(CustomConsoleLoggerFactory);
   app.useLogger(
-    customConsoleLoggerFactoryService.createLogger('', {
+    customConsoleLoggerFactory.createLogger('', {
       debugStackLevel: 8,
     }),
   );
